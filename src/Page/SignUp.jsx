@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, Typography, Container, Paper, Box, Link } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Grid, Typography, Container, Paper, Box, Link as MuiLink } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -35,6 +35,7 @@ function SignUpForm() {
       password: '',
       confirmPassword: '',
     });
+    navigate('/dashboard');
   };
 
   return (
@@ -121,9 +122,9 @@ function SignUpForm() {
             </Grid>
             <Grid xs={12} container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant='body2' onClick={() => navigate('/login')}>
+                <MuiLink component={Link} to="/" variant="body2">
                   Already have an account? Sign in
-                </Link>
+                </MuiLink>
               </Grid>
             </Grid>
           </Grid>

@@ -1,41 +1,65 @@
 import React, { useState } from 'react';
-import { Container, Box, Paper, TextField, Button, Typography, InputAdornment, IconButton, CssBaseline, Link } from "@mui/material";
-import { useNavigate } from 'react-router-dom';
+import { Container, Box, Paper, TextField, Button, Typography, InputAdornment, IconButton } from "@mui/material";
+import { Link, useNavigate } from 'react-router-dom';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import supabase from '../Services/Supabase';
 
-export default function Login() {
-  const [isError, setIsError] = useState(false);
+export default function LoginPage() {
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isError, setIsError] = useState(false); 
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("something went wrong");
 
-  const validate = () => {
-    setIsError(true);
+  const login = async () => {
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+  
+    if (error) {
+      setIsError(true);
+      setErrorMessage(error.message);
+    } else if (data) {
+      if (data.user) {
+        navigate("/dashboard");
+      } else {
+        setIsError(true);
+        setErrorMessage("Invalid email or password");
+      }
+    }
   };
 
   return (
-    <Box sx={{ width: "400px", margin: "5px auto", alignContent: "center", height: "95vh" }}>
+    <Box sx={{ width: "400px", margin: "5px auto", display: "flex", alignItems: "center", height: "95vh" }}>
       <Container maxWidth="xs" component={Paper} sx={{ p: 3 }}>
-        <Typography sx={{ p: 1, fontWeight: "Bold" }}>Login</Typography>
+        <Typography variant="h4" sx={{ p: 1, fontWeight: "bold" }}>Login</Typography>
+        {
+          isError && 
+          <Box>
+            <Typography color="red" align="center">{errorMessage}</Typography>
+          </Box>
+        }
         <Box sx={{ p: 1 }}>
           <TextField
             fullWidth
-            error={isError}
-            helperText={isError ? "Invalid Email" : ""}
             label="Email"
             variant="outlined"
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Box>
         <Box sx={{ p: 1 }}>
           <TextField
             type={showPassword ? "text" : "password"}
             fullWidth
-            error={isError}
-            helperText={isError ? "Invalid Password" : ""}
             label="Password"
             variant="outlined"
+            onChange={(e) => setPassword(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -48,18 +72,26 @@ export default function Login() {
           />
         </Box>
         <Box sx={{ p: 1 }}>
-          <Button size="small" fullWidth onClick={validate} variant="contained" endIcon={<LoginOutlinedIcon />}>Login</Button>
+          <Button 
+            size="small" 
+            fullWidth 
+            onClick={login} 
+            variant="contained" 
+            endIcon={<LoginOutlinedIcon />}>
+            Login
+          </Button>
         </Box>
         <Typography align="center">or</Typography>
         <Box sx={{ p: 1 }}>
+          <Link to="/signup">
           <Button
             size="small"
             fullWidth
-            onClick={() => navigate('/signup')}
             variant="contained"
             endIcon={<PersonAddAltOutlinedIcon />}>
             Sign up
           </Button>
+          </Link>
         </Box>
       </Container>
     </Box>
